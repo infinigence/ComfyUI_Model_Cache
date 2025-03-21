@@ -9,4 +9,7 @@ If you have installed comfy manager, you can use command below:
 ```bash
 python3 $CUSTOM_MANAGER_CLI/cm-cli.py install https://github.com/infinigence/ComfyUI_Model_Cache.git
 ```
-If you don't, you can easily use this custom node by copy the whole project to `ComfyUI/custom_nodes`.
+If you don't, you can easily use this custom node by moving the whole project to `ComfyUI/custom_nodes`.
+
+# Examples
+In `test/` directory, there are some sample workflows. They demonstrate the acceleration for some custom nodes.

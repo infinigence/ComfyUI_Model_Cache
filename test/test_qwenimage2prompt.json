@@ -1,0 +1,526 @@
+{
+  "last_node_id": 384,
+  "last_link_id": 143,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        4024.78759765625,
+        -654.6642456054688
+      ],
+      "size": [
+        315,
+        98
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            143
+          ]
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            141
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            68,
+            74
+          ]
+        }
+      ],
+      "title": "Checkpoint加载器(简易)",
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "sdxl/LEOSAM AIArt 兔狲插画 SDXL大模型_v1.safetensors"
+      ]
+    },
+    {
+      "id": 131,
+      "type": "LoadImage",
+      "pos": [
+        3479.22216796875,
+        -542.3040771484375
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            127,
+            138
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            129
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "1-watch.jpeg",
+        "image"
+      ]
+    },
+    {
+      "id": 296,
+      "type": "INPAINT_VAEEncodeInpaintConditioning",
+      "pos": [
+        4968.38330078125,
+        -434.7489318847656
+      ],
+      "size": [
+        415.8000183105469,
+        106
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 142
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 140
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 68
+        },
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 127
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 129
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            80
+          ]
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            81
+          ]
+        },
+        {
+          "name": "latent_inpaint",
+          "type": "LATENT",
+          "links": [],
+          "slot_index": 2
+        },
+        {
+          "name": "latent_samples",
+          "type": "LATENT",
+          "links": [
+            125
+          ]
+        }
+      ],
+      "title": "VAE编码局部重绘条件",
+      "properties": {
+        "Node name for S&R": "INPAINT_VAEEncodeInpaintConditioning"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 302,
+      "type": "VAEDecode",
+      "pos": [
+        6053.39697265625,
+        -312.6009216308594
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 73
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 74
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            131
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 310,
+      "type": "KSampler",
+      "pos": [
+        5652.11767578125,
+        -445.38739013671875
+      ],
+      "size": [
+        315,
+        262
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 143
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 80
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 81
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 125
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            73
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        638693406916504,
+        "randomize",
+        20,
+        1,
+        "euler",
+        "normal",
+        1
+      ]
+    },
+    {
+      "id": 370,
+      "type": "PreviewImage",
+      "pos": [
+        6319.49853515625,
+        -312.55975341796875
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 131
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 379,
+      "type": "CLIPTextEncodeSDXLRefiner",
+      "pos": [
+        4458.5185546875,
+        -460.5770568847656
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 141
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 139
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            140,
+            142
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncodeSDXLRefiner"
+      },
+      "widgets_values": [
+        6,
+        1024,
+        1024,
+        "",
+        [
+          false,
+          true
+        ]
+      ]
+    },
+    {
+      "id": 380,
+      "type": "LayerUtility: QWenImage2Prompt",
+      "pos": [
+        3883.260009765625,
+        -326.6363830566406
+      ],
+      "size": [
+        491.4000244140625,
+        58
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 138
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            139
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LayerUtility: QWenImage2Prompt"
+      },
+      "widgets_values": [
+        "describe this image"
+      ],
+      "color": "rgba(38, 73, 116, 0.7)"
+    }
+  ],
+  "links": [
+    [
+      68,
+      1,
+      2,
+      296,
+      2,
+      "VAE"
+    ],
+    [
+      73,
+      310,
+      0,
+      302,
+      0,
+      "LATENT"
+    ],
+    [
+      74,
+      1,
+      2,
+      302,
+      1,
+      "VAE"
+    ],
+    [
+      80,
+      296,
+      0,
+      310,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      81,
+      296,
+      1,
+      310,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      125,
+      296,
+      3,
+      310,
+      3,
+      "LATENT"
+    ],
+    [
+      127,
+      131,
+      0,
+      296,
+      3,
+      "IMAGE"
+    ],
+    [
+      129,
+      131,
+      1,
+      296,
+      4,
+      "MASK"
+    ],
+    [
+      131,
+      302,
+      0,
+      370,
+      0,
+      "IMAGE"
+    ],
+    [
+      138,
+      131,
+      0,
+      380,
+      0,
+      "IMAGE"
+    ],
+    [
+      139,
+      380,
+      0,
+      379,
+      1,
+      "STRING"
+    ],
+    [
+      140,
+      379,
+      0,
+      296,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      141,
+      1,
+      1,
+      379,
+      0,
+      "CLIP"
+    ],
+    [
+      142,
+      379,
+      0,
+      296,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      143,
+      1,
+      0,
+      310,
+      0,
+      "MODEL"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6588450000000007,
+      "offset": [
+        -3627.859493579418,
+        897.3765880646366
+      ]
+    },
+    "ue_links": []
+  },
+  "version": 0.4
+}
