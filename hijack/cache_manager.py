@@ -12,13 +12,24 @@ class ModelValidChecker:
         self.result = result
         # module dict should be the first place
         self.module = result[0] if isinstance(result, tuple) else result
-        self.key_count = len(self.module.keys())
+        self.key_count = self.get_latest_key_count()
 
     def is_valid(self) -> bool:
         # if tensors on gpu are released, the module keys are incomplete
-        if self.key_count == len(self.module.keys()):
+        if self.key_count == self.get_latest_key_count():
             return True
         return False
+
+    def get_latest_key_count(self) -> int:
+        if isinstance(self.module, torch.nn.Module):
+            return len(self.module.state_dict().keys())
+        elif isinstance(self.module, Dict):
+            return len(self.module.keys())
+
+        logger.warning(f"\033[92mModel_Cache: result is not torch.nn.Module or dict, but {type(self.module)}\033[0m")
+        logger.warning(f"\033[92mModel_Cache: So cache will never happen for this result! \033[0m")
+        # will nevel equal and never cache the result
+        return -1
     
     def get_result(self) -> torch.nn.Module | Tuple[torch.nn.Module, ...]:
         return self.result
