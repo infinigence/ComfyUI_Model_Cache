@@ -1,5 +1,3 @@
-import torch
-
 NODE_CLASS_MAPPINGS = {
 }
 
