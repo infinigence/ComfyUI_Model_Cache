@@ -1,0 +1,14 @@
+[project]
+name = "model_cache"
+description = "A model cached-loader custom node for ComfyUI."
+version = "1.0.0"
+license = {file = "LICENSE"}
+
+[project.urls]
+Repository = "https://github.com/infinigence/ComfyUI_Model_Cache"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI_Model_Cache"
+Icon = ""
