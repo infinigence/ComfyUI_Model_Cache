@@ -2,7 +2,7 @@ from .cache_manager import cache_model
 from .utils import hijack_func, hijack_class_func
 
 from comfy.utils import load_torch_file
-from transformers import AutoModel
+from transformers import AutoModel, AutoModelForCausalLM, BertModel
 
 @cache_model
 def load_torch_file_cache_model(origin_func, *args, **kwargs):
@@ -18,6 +18,8 @@ HIJACK_FUNC_MAP = {
 
 HIJACK_CLASS_FUNC_MAP = {
     AutoModel: ("from_pretrained", hijack_from_pretrained),
+    AutoModelForCausalLM: ("from_pretrained", hijack_from_pretrained),
+    BertModel: ("from_pretrained", hijack_from_pretrained),
 }
 
 def hijack_all():
