@@ -1,12 +1,15 @@
-
-from dataclasses import dataclass, field
 from functools import _make_key
 from typing import Dict, Tuple
 import torch
+import gc
 import logging
+
+from torch.nn.modules.module import Module
+from .utils import singleton
 
 logger = logging.getLogger(__name__)
 
+CACHE_MAXSIZE = 100
 class ModelValidChecker:
     def __init__(self, result):
         self.result = result
@@ -30,24 +33,31 @@ class ModelValidChecker:
         logger.warning(f"\033[92mModel_Cache: So cache will never happen for this result! \033[0m")
         # will nevel equal and never cache the result
         return -1
-    
+
     def get_result(self) -> torch.nn.Module | Tuple[torch.nn.Module, ...]:
         return self.result
 
-@dataclass
+@singleton
 class ModelCache:
-    models: Dict[str, ModelValidChecker] = field(default_factory=dict)
+    """
+    A Model Cache Manager for all kinds of decorated functions.
+    """
+    def __init__(self):
+        self.valid_checker_map : Dict[str, ModelValidChecker] = {}
+        self.lru_cache : list[str] = []
+        self.maxsize = CACHE_MAXSIZE
+        logger.info(f"\033[92mModelCache: ModelCache is initialized with maxsize:{self.maxsize}\033[0m")
 
     def generate_cache_key(self, *args, **kwargs):
         args_key = _make_key(args, kwargs, typed=True)
         return args_key
-    
+
     def cached(self, model_key) -> bool:
-        checker = self.models.get(model_key, None)
+        checker = self.valid_checker_map.get(model_key, None)
         if checker:
             return checker.is_valid()
         return False
-        
+
     def register_model(
         self,
         model_key: str,
@@ -61,26 +71,33 @@ class ModelCache:
         - A :class:`torch.nn.Module` class directly referencing the model.
         - B :A tuple with `torch.nn.Module` Dict at the first place and other kwargs follow-up
         """
-        self.models[model_key] = ModelValidChecker(result)
-            
-    def get_result(self, model_key):
-        logger.info(f"\033[92mModel_Cache: Return a cached module result with args:{model_key}\033[0m")
-        return self.models[model_key].get_result()
-    
-_model_cache = ModelCache()
+        if len(self.lru_cache) >= self.maxsize:
+            # cache list reached maxsize and release host memory
+            del_key = self.lru_cache.pop(0)
+            del self.valid_checker_map[del_key]
+            gc.collect()
+            torch.cuda.empty_cache()
 
-def get_model_cache():
-    global _model_cache
-    assert _model_cache is not None, "Model Cache has not been initialized."
-    return _model_cache
+        self.valid_checker_map[model_key] = ModelValidChecker(result)
+        if model_key in self.lru_cache:
+            self.lru_cache.remove(model_key)
+        self.lru_cache.append(model_key)
+
+    def get_result(self, model_key) -> Module | Tuple[Module]:
+        logger.info(f"\033[92mModel_Cache: Return a cached module result with args:{model_key}\033[0m")
+        # update lru cache
+        self.lru_cache.remove(model_key)
+        self.lru_cache.append(model_key)
+
+        return self.valid_checker_map[model_key].get_result()
 
 def cache_model(func):
     def wrapper(*args, **kwargs):
-        model_key = get_model_cache().generate_cache_key(*args, **kwargs)
-        if get_model_cache().cached(model_key):
-            return get_model_cache().get_result(model_key)
+        model_key = ModelCache().generate_cache_key(*args, **kwargs)
+        if ModelCache().cached(model_key):
+            return ModelCache().get_result(model_key)
 
         result = func(*args, **kwargs)
-        get_model_cache().register_model(model_key, result)
+        ModelCache().register_model(model_key, result)
         return result
     return wrapper

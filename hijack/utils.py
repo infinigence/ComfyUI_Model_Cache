@@ -6,6 +6,14 @@ from typing import Callable, Union
 
 always_true_func = lambda *args, **kwargs: True
 
+def singleton(cls):
+    instances = {}
+    def wrapper(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+    return wrapper
+
 class CondFunc:
     def __new__(cls, orig_func, sub_func, cond_func=always_true_func):
         self = super(CondFunc, cls).__new__(cls)
